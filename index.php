@@ -1,39 +1,68 @@
-<?php  if(isset($_GET['firstname'])){
-    $name=$_GET('name');
-}else{
-    print_r('all fields required');
+<?php include('helpers/db_connection.php') ?>
+
+<?php include('components/header.php') ?>
+
+<?php include('components/aside.php') ?>
+
+<?php
+
+if(isset($_POST['action']) && $_POST['action'] == 'delete') {
+    $id = $_POST['id'];
+
+    $sql = "DELETE FROM students where id = " .$id;
+
+    if(mysqli_query($conn, $sql)) {
+        echo "Record Delete";
+    } else {
+        echo "Error";
+    }
 }
 
+// SELECT Query
+$sql = "SELECT * FROM students";
+$result = mysqli_query($conn, $sql);
+$students = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
 ?>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action='' method='get' style="width:500px;">
-    <label for="fname">First name:</label>
-        <input type = 'text' name='firstname' value='' placeholder='' style='margin:10px'><br>
-        <label for="lastname">last name:</label>
-        <input type = 'text' name='lastname' value='' placeholder=''style='margin:10px'><br>
-        <label for="mail">mail:</label>
-        <input type = 'mail' name='mail' value='' placeholder=''style='margin:10px'><br>
-        <label for="numbere">number:</label>
-        <input type = 'number' name='number' value='' placeholder=''style='margin:10px'><br>
-        <label for="message">message:</label>
-        <input type = 'text' name='message' value='' placeholder=''style='margin:10px'>
-        <br>
-        <button style=
-  'background-color: #4CAF50; /* blue */
-  border: none;
-  color: white;
-  padding: 10px 80px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;'>send</button>
-    </form>    
-</body>
-</html>
+
+<main>
+    <div class="container-header">
+        <h2>Students</h2>
+        <a href="form.php" class="btn">Add New</a>
+    </div>
+    <div class="content">
+        <table>
+            <tr>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Age</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            <?php foreach($students as $student): ?>
+                <tr>
+                    <td><?= $student['name'] ?></td>
+                    <td><?= $student['lastname'] ?></td>
+                    <td><?= $student['age'] ?></td>
+                    <td>
+                        <?php if($student['status'] == 1){ ?>
+                            <span class="status active">active</span>
+                        <?php } else { ?>
+                            <span class="status inactive">inactive</span>
+                        <?php } ?>
+                    </td>
+                    <td class="actions">
+                        <a class="edit" href="edit.php?id=<?= $student['id'] ?>">Edit</a>
+                        <form action="" method="post">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="<?= $student['id'] ?>">
+                            <button class="delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </table>
+    </div>
+</main>
+
+<?php include('components/footer.php') ?>
